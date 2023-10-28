@@ -455,8 +455,8 @@ pipeline {
 			Jenkins Slave Node Configuration :::
 			
 			Jenkins_Master :::(VM)	Is to Create/Manage Jenkins Jobs and Schedule the Jobs.
-					Jenkins_SlaveNode1 ==> Build Application - Java 
-					Jenkins_SlaveNode1.2 ==> Build Application - Java 
+					Jenkins_SlaveNode1 ==> Build Application - Java 		--> mvn03.2.6
+					Jenkins_SlaveNode1.2 ==> Build Application - Java 		--> mvn3.9
 					Jenkins_SlaveNode2 ==> Build Application - .Net 
 					Jenkins_SlaveNode3 ==> Build Application - Python 
 					Jenkins_SlaveNode4 ==> Build Application - NodeJS
@@ -584,9 +584,8 @@ Next ::
 			
 			
 			
-			
 ###################
-21th Oct. 2023			
+21st Oct. 2023			
 ###################			
 			
 		Automate the CICD pipeline
@@ -699,100 +698,6 @@ Build Triggers :::
 										QA 		--> Quality Assurance Testing
 										UAT 	--> User Acceptance Testing			=====>		Prod Environment VM			
 																	
-
-
-######################Install TOMCAT Application Server on Ubuntu :::
-
-
-https://tomcat.apache.org/download-80.cgi
-
-Enable Port 8080 :
-
-sudo -i
-sudo apt update -y
-sudo apt install openjdk-11-jre -y 
-java -version
-
-#edit /etc/profile & add JAVA_HOME
-
-#/usr/lib/jvm/java-11-openjdk-amd64/
-
-vi /etc/profile
-
-/usr/lib/jvm/java-11-openjdk-amd64
-
-export JAVA_HOME="/usr/lib/jvm/java-11-openjdk-amd64"
-PATH=$PATH:$HOME/bin:$JAVA_HOME/bin
-
-source /etc/profile
-
-Install Tomcat ::
-
-cd /opt
-wget https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.95/bin/apache-tomcat-8.5.95.tar.gz
-
-https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.95/bin/apache-tomcat-8.5.95.tar.gz
-
-tar -xvzf /opt/apache-tomcat-8.5.95.tar.gz
-
-apache-tomcat-8.5.95.tar.gz
-
-mv apache-tomcat-8.5.95 tomcat
-
-#Start Tomcat Server:
-#Goto:
-
-cd /opt/tomcat/bin
-./startup.sh
-
-
-###########################################
-
-#Add User : 
-
-#useradd -m -d /home/devopsadmin devopsadmin
-#useradd devopsadmin
-
-useradd devopsadmin -s /bin/bash -m -d /home/devopsadmin
-
-su - devopsadmin
-
-#ssh-keygen
-
-#for Ubuntu ::
-ssh-keygen -t rsa -b 2048 -m PEM
-
-
-ls ~/.ssh 
-
-#You should see following two files:
-
-#id_rsa - private key
-#id_rsa.pub - public
-
-
-cat id_rsa.pub > authorized_keys
-
-chown -R devopsadmin /home/devopsadmin/.ssh
-chmod 600 /home/devopsadmin/.ssh/authorized_keys
-chmod 700 /home/devopsadmin/.ssh
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#make devopsadmin user as a owner to tomcat dir :
-
-chown -R devopsadmin /opt/tomcat
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-Deployment --> Copy the artifacts from source to target server 
-
-	--> Jenkins_Slave 											--->					Tomcat_Server 
-			target/mvn-hello-world.war							====>					/opt/tomcat/webapps/	
-			
-			
-Install publish over ssh in Jenkins Master 		& restart jenkins 	
-
 					
 		
 		- Github webhook :::
@@ -857,7 +762,7 @@ What ? window
 Which Appln - email
 		
 
-Next :::
+
 IAC Tools :::
 
 	Ansible ::::
@@ -865,8 +770,6 @@ IAC Tools :::
 
 
 Docker/Kubernetes 
-
-
 
 ######################Install TOMCAT Application Server on Ubuntu :::
 
@@ -959,3 +862,143 @@ Deployment --> Copy the artifacts from source to target server
 			
 			
 Install publish over ssh in Jenkins Master 		& restart jenkins 	
+
+
+
+
+###############
+22nd Oct. 2023			
+###############
+
+
+		IAC Tools :::	Infra-Structure As Code.
+		
+			- Provision/Create the Servers and its' resources.
+			
+			- Configuration Management 
+			
+			
+		In-House tools - Scripts.
+		
+		
+			Jenkins_Master 
+				Jenkins_SlaveNode1 ==> 
+			QA_Server ==> Testing 
+
+
+		Terraform 	==> Server Provisioning 
+		
+		Ansible 	==> Configuration Management - Install/Uninstall/Update and tool/service in the VM
+		
+		Ansible ::::
+		
+			Is a IAC Tool used for Configuration Management
+			
+			Architecture of Ansible
+			
+			Components of Ansible Architecture
+			
+			
+		Test Cycle :::
+			Dev 
+			Test 
+		
+		
+		Expect a New Environment which has to be created Dynamically
+		
+		Use_Case1 :
+		
+			Pipeline CI: 
+				SCM_Checkout --> Build --> deploy_to_Test_Server			
+			
+			Pipeline : Infra-Structure Team		--> Upstream Job			
+				SCM_Checkout --> Create the VM(Using Terraform) --> Configure the VM(Using Ansible)
+				
+			Pipeline CI: 	--> DownStream Job
+				SCM_Checkout --> Build --> deploy_to_Test_Server			
+				
+		Use_Case2 :
+		
+			Dev Team : 100+ Users			==> GIT 
+			Testing Team : 100+ Users
+
+
+		What is Ansible?
+		
+		
+		Ansible Architecture?
+				- Ansible Controller 
+				
+				- Ansible Target Nodes 
+				
+				- Inventory 
+				
+				- Modules 
+				
+				- ansible.cfg
+				
+				
+			Ansible Uses Push Mechanism to deploy/config any target nodes.
+			Because of push mechanism Ansible doesn't required any Agent to be installed in target nodes. - i.e., Agentless & Simple in Management.
+			
+			
+			Ansible Modules -->  
+			
+			To Execute the Ansible Modules ::
+			
+				Ansible Adhoc Commands  -->  apt install git -y
+				
+				Ansible Playbooks		--> Scripts written using YAML 
+											It is used to run some series of tasks in the target server
+											Ansible Playbooks should be reusable
+											
+											Tomcat Server :::
+											
+												JDK
+												Define ENV Variables
+												Install Tomcat 
+												Start tomcat 
+												
+			How to work with Ansible :
+			
+				1. Inventory file 
+				2. Modules 
+				3. Playbooks 
+			
+			
+			Installation :::
+					- Install and Configure Ansible Controller & target Nodes
+					- Ansible Adhoc Commands
+					- Ansible Playbooks 
+					
+					
+					SSH Connection --> User ID / SSH Keys.
+					
+					
+					In Jenkins ::
+					
+						Jenkins_Master 				
+							Jenkins_SlaveNode1 	- Create ssh_keys in slave node & shared the private key of slavenode to master node.
+							
+							
+					In Ansible Architecture ::
+					
+						Ansible Controller 				- public / private  -- ssh -> 
+							Ansible Target1 - Dev 
+							Ansible Target2 - Test 
+			
+				Linux Authentication Methods :::
+				
+					Password based Auth
+					key based Auth
+					Token based Auth 
+					Passwordless Auth
+			
+			
+				Create Inventory File ::::
+				
+				Ansible Adhoc Commands ::::
+				
+				
+				Ansible Facts ::: using -m setup.
+				
